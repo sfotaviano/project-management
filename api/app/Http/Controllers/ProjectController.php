@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreProjectRequest;
+use App\Http\Requests\UpdateProjectRequest;
 use App\Models\Project;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class ProjectController extends Controller
 {
@@ -14,19 +16,28 @@ class ProjectController extends Controller
 
     function show($id)
     {
-        return Project::findOrFail($id);
+        $project = Project::findOrFail($id);
+        Gate::authorize('view', $project);
+        return $project;
     }
 
-    function store(Request $request)
+    function store(StoreProjectRequest $request)
     {
+        $user = $request->user();
+
         $project = new Project($request->all());
+        $project->user_id = $user->id;
         $project->save();
+
         return response()->json($project, 201);
     }
 
-    function update(Request $request, $id)
+    function update(UpdateProjectRequest $request, $id)
     {
         $project = Project::find($id);
+
+        Gate::authorize('update', $project);
+
         if ($project) {
             $project->fill($request->all());
             $project->save();
@@ -38,6 +49,9 @@ class ProjectController extends Controller
     function destroy($id)
     {
         $project = Project::find($id);
+
+        Gate::authorize('delete', $project);
+
         if ($project) {
             $project->delete();
             return response()->json(['message' => 'Project deleted'], 200);
