@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('title');
             $table->text('description')->nullable();
             $table->date('completed_date')->nullable();
-            $table->enum('status', ['planned', 'in_progress', 'completed'])->default('planned');
+            $table->enum('status', ['pending', 'in_progress', 'completed'])->default('pending');
             $table->timestamps();
         });
     }

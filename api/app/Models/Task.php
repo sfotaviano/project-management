@@ -25,6 +25,6 @@ class Task extends Model
      * @var array
      */
     protected $attributes = [
-        'status' => 'planned',
+        'status' => 'pending',
     ];
 }
