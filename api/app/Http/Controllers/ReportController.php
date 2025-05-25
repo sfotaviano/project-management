@@ -14,8 +14,10 @@ class ReportController extends Controller
         $totalProjectsInProgress = Project::where('status', 'in_progress')->count();
         $totalProjectsPlanned = Project::where('status', 'planned')->count();
 
+        $totalTasks = Task::count();
         $totalTaskCompleted = Task::where('status', 'completed')->count();
-        $totalTaskPlanned = Task::where('status', 'pending')->count();
+        $totalTaskInProgress = Task::where('status', 'in_progress')->count();
+        $totalTaskPending = Task::where('status', 'pending')->count();
 
         $response = [
             'projects' => [
@@ -24,9 +26,11 @@ class ReportController extends Controller
                 'in_progress' => $totalProjectsInProgress,
                 'planned' => $totalProjectsPlanned,
             ],
-            'task' => [
+            'tasks' => [
+                'total' => $totalTasks,
                 'completed' => $totalTaskCompleted,
-                'pending' => $totalTaskPlanned,
+                'in_progress' => $totalTaskInProgress,
+                'pending' => $totalTaskPending,
             ],
         ];
 
