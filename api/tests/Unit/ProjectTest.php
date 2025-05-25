@@ -2,15 +2,27 @@
 
 namespace Tests\Unit;
 
+use App\Models\Project;
 use PHPUnit\Framework\TestCase;
 
 class ProjectTest extends TestCase
 {
-    /**
-     * A basic unit test example.
-     */
-    public function test_example(): void
+    public function test_project_can_be_instantiated_with_attributes()
     {
-        $this->assertTrue(true);
+        $data = ['name' => 'Meu Projeto', 'description' => 'Descrição'];
+        $project = new Project($data);
+
+        $this->assertEquals('Meu Projeto', $project->name);
+        $this->assertEquals('Descrição', $project->description);
+    }
+
+    public function test_project_attributes_can_be_set_and_get()
+    {
+        $project = new Project();
+        $project->name = 'Outro Projeto';
+        $project->description = 'Outra descrição';
+
+        $this->assertEquals('Outro Projeto', $project->name);
+        $this->assertEquals('Outra descrição', $project->description);
     }
 }
