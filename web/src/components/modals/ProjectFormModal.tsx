@@ -239,7 +239,10 @@ export const ProjectFormModal: React.FC<ModalProps> = ({
               label="Localização"
               extra="Digite o Cep para preencher a localização"
             >
-              <Input placeholder="Localização será preenchida automaticamente" />
+              <Input
+                allowClear
+                placeholder="Localização será preenchida automaticamente"
+              />
             </Form.Item>
           </Col>
 
