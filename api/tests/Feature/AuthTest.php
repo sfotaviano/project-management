@@ -58,7 +58,7 @@ class AuthTest extends TestCase
         $response = $this->postJson('/api/login', $data);
 
         $response->assertStatus(200)
-            ->assertJsonStructure(['token']);
+            ->assertJsonStructure(['token', 'user']);
     }
 
     public function test_user_cannot_login_with_wrong_password()

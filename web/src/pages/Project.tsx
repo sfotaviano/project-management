@@ -7,44 +7,11 @@ import { useState } from "react";
 import { ProjectFormModal } from "../components/modals/ProjectFormModal";
 import DeleteActionButton from "../components/delete-action-button";
 import { formatProjectStatusLabel } from "../utils/projectUtil";
+import useFeatch from "../hooks/useFeatch";
+import { deleteProject, getProjects } from "../services/project";
+import ErrorMessage from "../components/error-message";
 
 const { Column } = Table;
-
-const data: IProject[] = [
-  {
-    id: 1,
-    name: "Project Alpha",
-    description: "This is the first project.",
-    start_date: "2023-01-01",
-    end_date: "2023-12-31",
-    status: "planned",
-    location: "New York This is the first project.",
-    created_at: "2023-01-01T00:00:00Z",
-    updated_at: "2023-01-01T00:00:00Z",
-  },
-  {
-    id: 2,
-    name: "Project Beta",
-    description: "This is the second project.",
-    start_date: "2023-02-01",
-    end_date: "2023-11-30",
-    status: "in_progress",
-    location: "Los Angeles",
-    created_at: "2023-02-01T00:00:00Z",
-    updated_at: "2023-02-01T00:00:00Z",
-  },
-  {
-    id: 3,
-    name: "Project Gamma",
-    description: "This is the third project.",
-    start_date: "2023-03-01",
-    end_date: "2023-10-31",
-    status: "completed",
-    location: "Chicago",
-    created_at: "2023-03-01T00:00:00Z",
-    updated_at: "2023-03-01T00:00:00Z",
-  },
-];
 
 type ProjectFormModalProps = {
   open: boolean;
@@ -60,6 +27,8 @@ export default function Project() {
     type: null,
   });
 
+  const { data, error, isLoading, refeatch } = useFeatch(getProjects);
+
   const handleOpenFormModal = (id: number | null, type: "create" | "edit") => {
     setFormModal({ open: true, id, type });
   };
@@ -68,12 +37,17 @@ export default function Project() {
     setFormModal({ open: false, id: null, type: null });
   };
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
     if (deleteId !== null) {
-      alert(`Deleting project with ID: ${deleteId}`);
+      await deleteProject(deleteId);
+      refeatch();
     }
     setDeleteId(null);
   };
+
+  if (error) {
+    return <ErrorMessage message={error} />;
+  }
 
   return (
     <Container>
@@ -89,6 +63,7 @@ export default function Project() {
         onRow={(record) => ({
           onClick: () => handleOpenFormModal(record.id, "edit"),
         })}
+        loading={isLoading}
       >
         <Column title="Nome" dataIndex="name" key="name" />
         <Column
@@ -129,7 +104,7 @@ export default function Project() {
               title="Excluir a projeto"
               description="Tem certeza de que deseja excluir esta projeto?"
               onCancel={() => setDeleteId(null)}
-              onConfirm={() => handleDeleteConfirm()}
+              onConfirm={handleDeleteConfirm}
               onClick={() => setDeleteId(record.id)}
             />
           )}
@@ -140,6 +115,7 @@ export default function Project() {
         projectId={formModal.id}
         open={formModal.open}
         onCancel={handleCloseFormModal}
+        onSuccess={refeatch}
       />
     </Container>
   );

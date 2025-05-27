@@ -9,6 +9,7 @@ import { Layout, Menu, theme } from "antd";
 import { Outlet, useNavigate } from "react-router";
 import HeaderMenu from "../header-menu";
 import { SidebarLogo } from "../sidebar-logo";
+import { useAuth } from "../../contexts/auth";
 
 const { Header, Content, Sider } = Layout;
 
@@ -34,6 +35,8 @@ const PrivateLayout: React.FC = () => {
     token: { colorBgContainer },
   } = theme.useToken();
 
+  const { logout } = useAuth();
+
   const navigate = useNavigate();
 
   return (
@@ -50,7 +53,7 @@ const PrivateLayout: React.FC = () => {
       </Sider>
       <Layout>
         <Header style={{ background: colorBgContainer }}>
-          <HeaderMenu onLogout={() => {}} />
+          <HeaderMenu onLogout={logout} />
         </Header>
         <Content style={{ overflow: "initial" }}>
           <Outlet />

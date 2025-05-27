@@ -1,14 +1,45 @@
-import { Button, Form, Input, Flex, Layout, Typography, Card } from "antd";
+import {
+  Button,
+  Form,
+  Input,
+  Flex,
+  Layout,
+  Typography,
+  Card,
+  Alert,
+} from "antd";
+import type { AxiosError } from "axios";
+import React from "react";
 import { Link } from "react-router";
+import type { ApiErrorResponse } from "../interfaces/api";
+import { register } from "../services/auth";
+import { useAuth } from "../contexts/auth";
 
 type FormValues = {
+  name: string;
   email: string;
   password: string;
 };
 
 export default function SignUp() {
-  const onFinish = (values: FormValues) => {
-    console.log("Received values of form: ", values);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+
+  const { login } = useAuth();
+
+  const onFinish = async (values: FormValues) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      await register(values);
+      await login(values.email, values.password);
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<ApiErrorResponse>;
+      setError(axiosError?.response?.data?.message || "Erro desconhecido");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -50,11 +81,21 @@ export default function SignUp() {
           </Form.Item>
 
           <Form.Item>
-            <Flex vertical align="center" gap={20}>
-              <Button block type="primary" htmlType="submit">
+            <Flex vertical gap={20}>
+              {error && <Alert message={error} type="error" showIcon />}
+
+              <Button
+                block
+                type="primary"
+                htmlType="submit"
+                loading={isLoading}
+              >
                 Registrar
               </Button>
-              <Link to="/login">Fazer login!</Link>
+
+              <Link style={{ textAlign: "center" }} to="/login">
+                Fazer login!
+              </Link>
             </Flex>
           </Form.Item>
         </Form>

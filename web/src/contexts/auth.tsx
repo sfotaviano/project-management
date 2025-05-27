@@ -34,8 +34,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }
 
   async function logout() {
-    localStorage.deleteItem("token");
-    localStorage.deleteItem("user");
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     setToken(null);
     setUser(null);
   }
@@ -45,10 +45,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const storagedUser = localStorage.getItem("user");
       const storagedToken = localStorage.getItem("token");
 
-      if (storagedUser && storagedToken) {
-        setUser(JSON.parse(storagedUser));
-        setToken(storagedToken);
-      }
+      if (storagedUser) setUser(JSON.parse(storagedUser));
+      if (storagedToken) setToken(storagedToken);
     }
 
     loadStorageData();

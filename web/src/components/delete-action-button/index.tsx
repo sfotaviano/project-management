@@ -35,9 +35,9 @@ const DeleteActionButton: React.FC<DeleteActionButtonProps> = ({
         handlePrependClick(e);
         onCancel?.(e);
       }}
-      onConfirm={(e) => {
+      onConfirm={async (e) => {
         handlePrependClick(e);
-        onConfirm?.(e);
+        await new Promise((resolve) => resolve(onConfirm?.(e)));
       }}
     >
       <Button

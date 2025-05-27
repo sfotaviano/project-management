@@ -7,10 +7,13 @@ import {
   Layout,
   Typography,
   Card,
-  notification,
+  Alert,
 } from "antd";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useAuth } from "../contexts/auth";
+import type { AxiosError } from "axios";
+import type { ApiErrorResponse } from "../interfaces/api";
+import React from "react";
 
 type FormValues = {
   email: string;
@@ -18,28 +21,30 @@ type FormValues = {
 };
 
 export default function Login() {
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+
   const [form] = Form.useForm();
   const { login } = useAuth();
-
-  const [api, contextHolder] = notification.useNotification();
+  const navigate = useNavigate();
 
   const onFinish = async (values: FormValues) => {
-    try {
-      // await login(values.email, values.password);
-      await Promise.resolve(() => setTimeout(() => {}, 5000));
-    } catch (error) {
-      console.error(error);
+    setIsLoading(true);
+    setError(null);
 
-      api.error({
-        message: (error as any)?.response?.data?.message,
-        description: "Erro ao tentar logar com as credenciais fornecidas",
-      });
+    try {
+      await login(values.email, values.password);
+      navigate("/projects", { replace: true });
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<ApiErrorResponse>;
+      setError(axiosError?.response?.data?.message || "Erro desconhecido");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <Layout style={{ height: "100vh" }}>
-      {contextHolder}
       <Card
         title={<Typography.Title level={2}>Entrar</Typography.Title>}
         variant="borderless"
@@ -65,11 +70,18 @@ export default function Login() {
           </Form.Item>
 
           <Form.Item>
-            <Flex vertical align="center" gap={20}>
-              <Button block type="primary" htmlType="submit">
+            <Flex vertical gap={20}>
+              {error && <Alert message={error} type="error" showIcon />}
+
+              <Button
+                block
+                type="primary"
+                htmlType="submit"
+                loading={isLoading}
+              >
                 Entrar
               </Button>
-              <span>
+              <span style={{ textAlign: "center" }}>
                 ou <Link to="/signup">Registre-se agora!</Link>
               </span>
             </Flex>

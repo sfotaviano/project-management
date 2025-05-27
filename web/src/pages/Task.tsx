@@ -7,41 +7,11 @@ import { Header } from "../components/header";
 import DeleteActionButton from "../components/delete-action-button";
 import { formatTaskStatusLabel } from "../utils/taskUtil";
 import { TaskFormModal } from "../components/modals/TaskFormModal";
+import useFeatch from "../hooks/useFeatch";
+import { deleteTask, getTasks } from "../services/task";
+import ErrorMessage from "../components/error-message";
 
 const { Column } = Table;
-
-const data: ITask[] = [
-  {
-    id: 1,
-    project_id: 1,
-    title: "Task Alpha",
-    description: "This is the first task.",
-    completed_date: "2023-01-01",
-    status: "pending",
-    created_at: "2023-01-01T00:00:00Z",
-    updated_at: "2023-01-01T00:00:00Z",
-  },
-  {
-    id: 2,
-    project_id: 1,
-    title: "Task Beta",
-    description: "This is the second task.",
-    completed_date: "2023-02-01",
-    status: "in_progress",
-    created_at: "2023-02-01T00:00:00Z",
-    updated_at: "2023-02-01T00:00:00Z",
-  },
-  {
-    id: 3,
-    project_id: 1,
-    title: "Task Gamma",
-    description: "This is the third task.",
-    completed_date: "2023-03-01",
-    status: "completed",
-    created_at: "2023-03-01T00:00:00Z",
-    updated_at: "2023-03-01T00:00:00Z",
-  },
-];
 
 type TaskFormModalProps = {
   open: boolean;
@@ -57,6 +27,8 @@ export default function Task() {
     type: null,
   });
 
+  const { data, error, isLoading, refeatch } = useFeatch(getTasks);
+
   const handleOpenFormModal = (id: number | null, type: "create" | "edit") => {
     setFormModal({ open: true, id, type });
   };
@@ -65,12 +37,17 @@ export default function Task() {
     setFormModal({ open: false, id: null, type: null });
   };
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
     if (deleteId !== null) {
-      alert(`Deleting task with ID: ${deleteId}`);
+      await deleteTask(deleteId);
+      refeatch();
     }
     setDeleteId(null);
   };
+
+  if (error) {
+    return <ErrorMessage message={error} />;
+  }
 
   return (
     <Container>
@@ -86,6 +63,7 @@ export default function Task() {
         onRow={(record) => ({
           onClick: () => handleOpenFormModal(record.id, "edit"),
         })}
+        loading={isLoading}
       >
         <Column title="Título" dataIndex="title" key="title" />
         <Column
@@ -120,7 +98,7 @@ export default function Task() {
               title="Excluir a tarefa"
               description="Tem certeza de que deseja excluir esta tarefa?"
               onCancel={() => setDeleteId(null)}
-              onConfirm={() => handleDeleteConfirm()}
+              onConfirm={handleDeleteConfirm}
               onClick={() => setDeleteId(record.id)}
             />
           )}
@@ -131,6 +109,7 @@ export default function Task() {
         taskId={formModal.id}
         open={formModal.open}
         onCancel={handleCloseFormModal}
+        onSuccess={refeatch}
       />
     </Container>
   );

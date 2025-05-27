@@ -1,4 +1,9 @@
-import { createBrowserRouter, RouterProvider } from "react-router";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Navigate,
+  Outlet,
+} from "react-router";
 import Project from "../pages/Project";
 import Task from "../pages/Task";
 import Report from "../pages/Report";
@@ -7,37 +12,38 @@ import Login from "../pages/Login";
 import SignUp from "../pages/SingUp";
 import { useAuth } from "../contexts/auth";
 
-export default function Router() {
+function RequireAuth() {
   const { token } = useAuth();
+  return token ? <Outlet /> : <Navigate to="/login" replace />;
+}
 
-  console.log("token", token);
+function GuestGuard() {
+  const { token } = useAuth();
+  return token ? <Navigate to="/projects" replace /> : <Outlet />;
+}
 
+export default function Router() {
   const router = createBrowserRouter([
     {
-      path: "/",
-      Component: PrivateLayout,
+      element: <RequireAuth />, // Protege todas as rotas filhas
       children: [
         {
-          path: "/projects",
-          Component: Project,
-        },
-        {
-          path: "/tasks",
-          Component: Task,
-        },
-        {
-          path: "/reports",
-          Component: Report,
+          path: "/",
+          element: <PrivateLayout />,
+          children: [
+            { path: "/projects", element: <Project /> },
+            { path: "/tasks", element: <Task /> },
+            { path: "/reports", element: <Report /> },
+          ],
         },
       ],
     },
     {
-      path: "/login",
-      Component: Login,
-    },
-    {
-      path: "/signup",
-      Component: SignUp,
+      element: <GuestGuard />,
+      children: [
+        { path: "/login", element: <Login /> },
+        { path: "/signup", element: <SignUp /> },
+      ],
     },
   ]);
 

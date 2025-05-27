@@ -1,31 +1,29 @@
-import { Card, Col, Row, Statistic, Typography } from "antd";
+import { Card, Col, Row, Statistic } from "antd";
 import Container from "../components/container";
-import type { IReport } from "../interfaces/report";
-
-const data: IReport = {
-  projects: {
-    total: 10,
-    in_progress: 5,
-    planned: 3,
-    completed: 2,
-  },
-  tasks: {
-    total: 100,
-    pending: 50,
-    in_progress: 30,
-    completed: 20,
-  },
-};
+import useFeatch from "../hooks/useFeatch";
+import { getReportSummary } from "../services/report";
+import { Header } from "../components/header";
+import ErrorMessage from "../components/error-message";
 
 export default function Report() {
+  const { data: summary, error, isLoading } = useFeatch(getReportSummary);
+
+  if (error) {
+    return <ErrorMessage message={error} />;
+  }
+
   return (
     <Container>
-      <Typography.Title level={1}>Relatório</Typography.Title>
+      <Header title="Relatório" buttonHidden />
 
       <Row gutter={[16, 16]}>
         <Col span={6}>
           <Card variant="borderless">
-            <Statistic title="Total de Projetos" value={data.projects.total} />
+            <Statistic
+              title="Total de Projetos"
+              value={summary?.projects.total ?? 0}
+              loading={isLoading}
+            />
           </Card>
         </Col>
 
@@ -33,7 +31,8 @@ export default function Report() {
           <Card variant="borderless">
             <Statistic
               title="Projetos em Andamento"
-              value={data.projects.in_progress}
+              value={summary?.projects.in_progress ?? 0}
+              loading={isLoading}
             />
           </Card>
         </Col>
@@ -42,7 +41,8 @@ export default function Report() {
           <Card variant="borderless">
             <Statistic
               title="Projetos Concluídos"
-              value={data.projects.completed}
+              value={summary?.projects.completed ?? 0}
+              loading={isLoading}
             />
           </Card>
         </Col>
@@ -51,14 +51,19 @@ export default function Report() {
           <Card variant="borderless">
             <Statistic
               title="Projetos Planejados"
-              value={data.projects.planned}
+              value={summary?.projects.planned ?? 0}
+              loading={isLoading}
             />
           </Card>
         </Col>
 
         <Col span={6}>
           <Card variant="borderless">
-            <Statistic title="Total de Tarefas" value={data.tasks.total} />
+            <Statistic
+              title="Total de Tarefas"
+              value={summary?.tasks.total ?? 0}
+              loading={isLoading}
+            />
           </Card>
         </Col>
 
@@ -66,7 +71,8 @@ export default function Report() {
           <Card variant="borderless">
             <Statistic
               title="Tarefas em Andamento"
-              value={data.tasks.in_progress}
+              value={summary?.tasks.in_progress ?? 0}
+              loading={isLoading}
             />
           </Card>
         </Col>
@@ -75,14 +81,19 @@ export default function Report() {
           <Card variant="borderless">
             <Statistic
               title="Tarefas Concluídos"
-              value={data.tasks.completed}
+              value={summary?.tasks.completed ?? 0}
+              loading={isLoading}
             />
           </Card>
         </Col>
 
         <Col span={6}>
           <Card variant="borderless">
-            <Statistic title="Tarefas Pendentes " value={data.tasks.pending} />
+            <Statistic
+              title="Tarefas Pendentes "
+              value={summary?.tasks.pending ?? 0}
+              loading={isLoading}
+            />
           </Card>
         </Col>
       </Row>
