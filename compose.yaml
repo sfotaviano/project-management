@@ -60,11 +60,11 @@ services:
     build:
       context: ./web
       dockerfile: Dockerfile
+    entrypoint: .docker/entrypoint.sh
     volumes:
       - ./web:/app
       - /app/node_modules
     working_dir: /app
-    command: npm run dev -- --host 0.0.0.0
     ports:
       - "5173:5173"
     networks:
