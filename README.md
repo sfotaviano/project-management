@@ -66,6 +66,9 @@ Esta é uma aplicação de gerenciamento de projetos e tarefas, desenvolvida par
 
      # Instale as dependências PHP dentro do container da API
      docker compose exec workspace composer install
+
+     # Rode as migrations para criar as tabelas no banco de dados
+     docker compose exec workspace php artisan migrate
    ```
 
 4. Suba todos os containers:
